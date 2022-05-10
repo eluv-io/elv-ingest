@@ -1,0 +1,117 @@
+// sass-lint:disable no-vendor-prefixes, no-color-literals, force-pseudo-nesting
+
+body {
+  color: $black;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+
+  * {
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+  }
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  &:focus-visible {
+    box-shadow: 0 0 3px $blue;
+    outline: 1px solid $blue;
+  }
+}
+
+button {
+  &:focus {
+    box-shadow: 0 0 3px $blue;
+    outline: 1px solid $blue;
+  }
+}
+
+body,
+.app,
+.app-container,
+main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+  max-width: 100%;
+  min-height: 90vh;
+  padding: 0;
+}
+
+.app-container {
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+.eluvio-player__controls {
+  z-index: 1;
+}
+
+.current-path {
+  background: $black;
+  color: $white;
+  font-weight: 300;
+  padding: 10px 20px;
+}
+
+.app-container {
+  flex-direction: row;
+}
+
+.page-container-nav {
+  flex-direction: row;
+}
+
+.page-header,
+.content-header {
+  font-size: 26px;
+  font-weight: 300;
+}
+
+.page-header {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.error-container {
+  align-items: center;
+  display: flex;
+  font-size: 24px;
+  font-weight: 300;
+  justify-content: center;
+  width: 100%;
+}
+
+.edit-page {
+  padding-bottom: 100px;
+
+  &__header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    min-height: 35px;
+
+    &__text {
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    .page-header {
+      margin: 0;
+    }
+  }
+
+  &__localization-select {
+    font-size: 14px;
+    min-width: 200px;
+
+    &-active {
+      filter: drop-shadow(0 0 2px $gold);
+    }
+  }
+}

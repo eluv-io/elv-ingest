@@ -1,0 +1,165 @@
+// sass-lint:disable function-name-format
+
+.content-browser-modal {
+  width: 100%;
+
+  .modal__content {
+    max-width: MIN(90vw, 1000px);
+    width: 100%;
+  }
+
+  .content-browser {
+    height: 100vh;
+    max-width: 1000px;
+    padding: 20px 40px 40px;
+    width: MIN(100vw, 100%);
+  }
+}
+
+.content-browser {
+  display: flex;
+  flex: 1 1 100%;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  min-height: 500px;
+  width: 100%;
+
+  &__header {
+    align-items: center;
+    display: flex;
+    margin: 15px 0;
+
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  &__header-actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+
+    .actions-container {
+      width: auto;
+    }
+  }
+
+  .content-list {
+    max-height: 100%;
+    overflow-y: scroll;
+
+    &__item {
+      &:nth-child(odd) {
+        background-color: $lightestgray;
+      }
+    }
+
+    &-versions {
+      .content-list__item {
+        @include ellipsis;
+        font-size: 14px;
+      }
+    }
+  }
+
+  &__lookup {
+    display: flex;
+    height: 35px;
+    min-width: 300px;
+    padding: 0;
+    width: 300px;
+  }
+
+  &__lookup-input {
+    border: 1px solid $mediumgray;
+    font-size: 12px;
+    height: 100%;
+    text-align: left;
+    width: 100%;
+
+    &::placeholder {
+      padding: 0;
+    }
+  }
+
+  &__lookup-button {
+    border: 1px solid $mediumgray;
+    border-radius: 3px;
+    cursor: pointer;
+    height: 100%;
+    margin-left: 5px;
+    min-width: 35px;
+    padding: 8px;
+    width: 35px;
+  }
+
+  &__lookup-button-icon {
+    height: 100%;
+    width: 100%;
+  }
+
+  &__navigation {
+    align-items: center;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    min-height: 50px;
+    position: relative;
+    width: 100%;
+  }
+
+  &__location {
+    @include ellipsis;
+
+    font-size: 20px;
+    font-weight: 300;
+    text-align: center;
+    width: 100%;
+  }
+
+  &__back-button {
+    color: $blue;
+    cursor: pointer;
+    left: 0;
+    min-width: 190px;
+    position: absolute;
+    text-decoration: underline;
+  }
+
+  &__page-controls {
+    align-items: center;
+    display: flex;
+    flex: 1 1 100%;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  &__page {
+    color: $darkgray;
+    font-size: 20px;
+    font-weight: 300;
+    margin: 0 20px;
+    text-align: center;
+    width: 90px;
+  }
+
+  &__page-button {
+    border: 1px solid $mediumgray;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    height: 100%;
+    text-align: center;
+    user-select: none;
+    width: 40px;
+
+    &:disabled {
+      cursor: auto;
+      opacity: 0.25;
+    }
+  }
+}

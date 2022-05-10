@@ -1,0 +1,26 @@
+$white: #fff;
+$black: #000;
+$lightestgray: #f9f9f9;
+$lightergray: #f3f3f3;
+$lightgray: #eee;
+$mediumgray: #ccc;
+$mediumergray: #aaa;
+$mediumestgray: #888;
+$darkgray: #555;
+$darkergray: #333;
+$darkestgray: #151515;
+
+$translucent-black: rgba($black, 0.5);
+$light-translucent-black: rgba($black, 0.25);
+
+$blue: #2e69c6;
+$gold: #ffc010;
+$red: #f00;
+$mediumred: #a33;
+$green: #058005;
+
+@mixin ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

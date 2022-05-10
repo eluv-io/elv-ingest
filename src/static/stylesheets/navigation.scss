@@ -1,0 +1,102 @@
+.navigation {
+  background: $darkergray;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  padding: 20px 0;
+  user-select: none;
+  width: 150px;
+
+  &__link {
+    align-items: center;
+    color: $white;
+    cursor: pointer;
+    display: flex;
+    height: 40px;
+    padding: 0 20px;
+
+    &-back {
+      background-color: $darkergray;
+      margin-bottom: 20px;
+    }
+
+    &.active {
+      background-color: $blue;
+    }
+  }
+
+  &__logo-container {
+    padding: 10px 20px 30px;
+  }
+
+  &__logo {
+    * {
+      fill: $white;
+      stroke: $white;
+    }
+  }
+
+  &-sub {
+    background: $darkgray;
+    border-left: 1px solid $darkergray;
+    min-width: 200px;
+  }
+
+  @media screen and (max-width: 1000px) {
+    display: none;
+  }
+}
+
+.navigation-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  user-select: none;
+  width: 100%;
+
+  &__link {
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    padding: 20px;
+
+    &:hover {
+      border-left: 3px solid lighten($blue, 20%);
+    }
+  }
+}
+
+.navigation-header {
+  align-items: center;
+  display: flex;
+
+  &__link {
+    @include ellipsis;
+
+    border: 1px solid $blue;
+    border-radius: 3px;
+    color: $blue;
+    cursor: pointer;
+    font-weight: 300;
+    height: 32px;
+    max-width: 250px;
+    padding: 5px 10px;
+  }
+
+  &__link-active {
+    border: 1px solid $black;
+    color: $black;
+  }
+
+  &__link-separator {
+    content: "/";
+    padding: 0 10px;
+
+    &::before {
+      content: "/";
+    }
+
+    &:last-child {
+      display: none;
+    }
+  }
+}

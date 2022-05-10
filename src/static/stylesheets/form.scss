@@ -1,0 +1,20 @@
+.form {
+  &__section {
+    margin-bottom: 20px;
+    padding: 0 0 20px;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $lightgray;
+    }
+  }
+
+  &__section__header {
+    font-size: 24px;
+    font-weight: 300;
+    margin: 20px 0;
+  }
+}
+
+.form-actions {
+  margin-top: 40px;
+}

@@ -1,0 +1,515 @@
+.actions-container {
+  align-items: center;
+  display: flex;
+  padding: 10px 0;
+  width: 100%;
+
+  .action {
+    &:not(:first-child) {
+      margin-left: 12px;
+    }
+  }
+}
+
+.action {
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  height: 35px;
+  min-width: 130px;
+  padding: 8px 20px;
+  text-align: center;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  &-icon {
+    height: 35px;
+    min-width: 35px;
+    padding: 5px;
+    width: 35px;
+
+    &__icon {
+      height: 100%;
+      stroke: $darkgray;
+      stroke-width: 1.5px;
+      width: 100%;
+    }
+
+    &:hover {
+      * {
+        stroke: $blue;
+      }
+    }
+  }
+
+  &-primary {
+    background: linear-gradient(150deg, darken($blue, 3%), lighten($blue, 3%));
+    border: 1px solid $blue;
+    color: $white;
+
+    &:not(:disabled) {
+      &:hover {
+        background: linear-gradient(80deg, $blue, lighten($blue, 5%));
+      }
+    }
+  }
+
+  &-secondary {
+    border: 1px solid $mediumgray;
+    color: $black;
+
+    &:hover {
+      border-color: $darkgray;
+    }
+  }
+
+  &-danger {
+    background-color: $black;
+    border: 1px solid $black;
+    color: $white;
+  }
+}
+
+.action-icon {
+  border: 1px solid $mediumgray;
+  display: flex;
+  padding: 0;
+
+  line {
+    stroke: $darkgray;
+    stroke-width: 1px;
+  }
+
+  &:hover {
+    border: 1px solid $blue;
+
+    * {
+      stroke: $blue;
+    }
+  }
+}
+
+.action-input {
+  height: 35px;
+  max-width: 400px;
+  padding: 5px 10px;
+  width: 100%;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid $mediumgray;
+
+  &:hover {
+    border: 1px solid $darkgray;
+  }
+}
+
+select {
+  appearance: none;
+  background-color: $white;
+  background-image: url("data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 35 20.63'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:none;stroke:%23626262;stroke-linecap:round;stroke-miterlimit:10;stroke-width:4px;%7D%3C/style%3E%3C/defs%3E%3Cpolyline class='cls-1' points='2 2 17.8 17.8 33 2.6'/%3E%3C/svg%3E");
+  background-position: right 15px center;
+  background-repeat: no-repeat;
+  background-size: 14px 7px;
+  border: 1px solid $mediumgray;
+  border-radius: 3px;
+  cursor: pointer;
+  height: 35px;
+  overflow: hidden;
+  padding: 5px 6px;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+input {
+  height: 35px;
+  padding: 5px 10px;
+
+  &[type="checkbox"] {
+    cursor: pointer;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    width: 20px;
+  }
+
+  &[type="color"] {
+    border-radius: 10px;
+    cursor: pointer;
+    height: 35px;
+    max-width: 35px;
+    min-width: 0;
+    padding: 0;
+    width: 35px;
+  }
+
+  &:read-only {
+    border: 0;
+    opacity: 0.75;
+  }
+}
+
+textarea {
+  min-height: 10em;
+  padding: 5px 10px;
+  resize: both;
+}
+
+.input-list {
+  &__show-hide-button {
+    border: 0;
+    height: 20px;
+    margin-left: 7px;
+    width: 20px;
+
+    &:hover {
+      border: 0;
+
+      svg {
+        border: 1px solid $blue;
+      }
+    }
+
+    svg {
+      border: 1px solid $lightgray;
+      border-radius: 50px;
+      stroke: $mediumgray;
+    }
+  }
+
+  &__label {
+    align-items: center;
+    display: flex;
+  }
+
+  &__item {
+    align-items: flex-start;
+    display: flex;
+    padding: 10px;
+
+    &:nth-child(2) {
+      background-color: $lightestgray;
+    }
+  }
+
+  &__item__actions-container {
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .actions-container {
+    padding: 0;
+    width: auto;
+
+    .action-icon {
+      margin: 3px 0;
+    }
+  }
+
+  &__add-actions-container {
+    &:not(:first-child) {
+      margin-top: 10px;
+    }
+  }
+}
+
+.labelled-field {
+  align-items: flex-start;
+  display: flex;
+  margin-bottom: 10px;
+  min-height: 45px;
+  min-width: 700px;
+  width: min-content;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $lightergray;
+  }
+
+  &:hover {
+    label {
+      color: $black;
+    }
+  }
+
+  label {
+    align-items: center;
+    color: $darkgray;
+    cursor: pointer;
+    display: flex;
+    font-size: 14px;
+    height: 35px;
+    justify-content: flex-start;
+    min-width: 200px;
+    padding-right: 20px;
+    width: 200px;
+  }
+
+  &__label-text {
+    width: max-content;
+  }
+
+  &__hint {
+    cursor: pointer;
+    height: 30px;
+    padding-bottom: 10px;
+    width: 30px;
+
+    * {
+      stroke: $mediumergray;
+    }
+  }
+
+  &__hint-content {
+    background-color: $white;
+    border: 1px solid $mediumgray;
+    border-radius: 3px;
+    filter: drop-shadow(0 0 5px $light-translucent-black);
+    max-width: 350px;
+    padding: 15px 20px;
+  }
+
+  .input-text {
+    min-width: 400px;
+  }
+
+  .input-color {
+    &__text {
+      margin-left: 10px;
+      max-width: 100px;
+      min-width: 100px;
+    }
+  }
+
+  input {
+    &[type="checkbox"] {
+      height: 35px;
+      width: 20px;
+    }
+  }
+
+  textarea,
+  select {
+    min-width: 400px;
+  }
+
+  textarea {
+    margin-bottom: 10px;
+  }
+
+  .currency-input {
+    align-items: center;
+    display: flex;
+    max-width: 400px;
+    width: 100%;
+
+    &__symbol {
+      color: $mediumestgray;
+      padding-right: 5px;
+    }
+
+    input {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+
+
+  // sass-lint:disable class-name-format
+  // Material UI changes
+  .datetime-clear {
+    margin-left: 10px;
+  }
+
+  .MuiFormControl-root {
+    * {
+      box-sizing: border-box;
+    }
+
+    .action {
+      padding: 0;
+    }
+  }
+
+  .MuiInputBase-root {
+    margin: 0;
+  }
+
+  .MuiInputLabel-root {
+    display: none;
+  }
+
+  .MuiInput-underline {
+    &::after {
+      display: none;
+    }
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .MuiInputBase-input {
+    border: 1px solid $mediumgray;
+    cursor: pointer;
+    max-height: 35px;
+    min-height: 35px;
+    min-width: 400px;
+    opacity: 1;
+    padding: 5px 10px;
+  }
+}
+
+.rich-text {
+  margin-bottom: 10px;
+
+  &__editor {
+    margin-bottom: 20px;
+    min-height: 200px;
+    min-width: 710px;
+  }
+}
+
+.multiselect {
+  margin-bottom: 10px;
+
+  &__selection {
+    align-items: center;
+    display: flex;
+    margin-bottom: 10px;
+    max-width: 400px;
+    width: 100%;
+
+    select {
+      flex: 1 1 100%;
+      min-width: unset;
+      width: 400px;
+    }
+  }
+
+  .actions-container {
+    padding: 0;
+    width: auto;
+
+    .multiselect__button-remove {
+      margin-left: 10px;
+    }
+  }
+}
+
+.link-selection {
+  margin-bottom: 10px;
+  min-width: 400px;
+  width: 500px;
+
+  .labelled-field {
+    border: 0;
+    min-width: 0;
+  }
+
+  &__select-button {
+    font-size: 14px;
+    height: 35px;
+    min-width: 220px;
+    padding: 0 15px;
+  }
+
+  &__selected {
+    align-items: center;
+    border: 1px solid $mediumgray;
+    border-radius: 3px;
+    display: flex;
+    height: 35px;
+    max-width: 400px;
+    min-width: 400px;
+    width: 100%;
+  }
+
+  &__selected__path {
+    @include ellipsis;
+    flex: 1 1 100%;
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  &__selected__remove {
+    height: 35px;
+    width: 35px;
+  }
+
+  &__icon {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    padding: 0;
+
+    * {
+      stroke: $darkgray;
+      stroke-width: 1.5px;
+    }
+
+    &:hover {
+      * {
+        stroke: $blue;
+      }
+    }
+  }
+
+  &__selected__icon {
+    height: 25px;
+    margin: 0 10px 0 5px;
+    min-width: 25px;
+    padding: 0;
+
+    &-active {
+      circle {
+        fill: $blue;
+        stroke: $blue;
+      }
+
+      polygon {
+        fill: $white;
+        stroke: $white;
+      }
+
+      &:hover {
+        polygon {
+          stroke: $white;
+        }
+      }
+    }
+  }
+
+  &__selected__labelled-field,
+  &__alt-text__labelled-field {
+    label {
+      min-width: 100px;
+      width: 100px;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+
+  &__video-preview {
+    height: 280px;
+    margin-bottom: 10px;
+    max-height: 280px;
+    min-width: 500px;
+    width: 500px;
+
+    video {
+      height: 280px;
+      max-height: 280px;
+      min-width: 500px;
+      width: 500px;
+    }
+  }
+}

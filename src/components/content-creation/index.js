@@ -21,6 +21,7 @@ const ContentCreation = observer(() => {
   const [images, setImages] = useState([]);
   const [disableDrm, setDisableDrm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [embedPlayerSrc, setEmbedPlayerSrc] = useState(undefined);
 
   useEffect( () => {
     if(!rootStore.ingestStore.libraryId) throw Error("Unable to find library ID");
@@ -144,17 +145,20 @@ const ContentCreation = observer(() => {
             })
           }
         </div>
-        <button
-          className="action action-primary"
-          type="submit"
-          disabled={!rootStore.editStore.Value(objectId, "", "title") || !files}
-          onClick={HandleUpload}
-        >
-          Ingest
-        </button>
       </Form>
     );
   };
+
+  const OpenObjectLink = () => {
+    rootStore.client.SendMessage({
+      options: {
+        operation: "OpenLink",
+        libraryId: rootStore.libraryId,
+        objectId: rootStore.ingestStore.ingestObjectId
+      },
+      noResponse: true
+    });
+  }
 
   const SetIcon = (step) => {
     const ingestObject = toJS(rootStore.ingestStore.ingestObject);
@@ -186,7 +190,7 @@ const ContentCreation = observer(() => {
 
     return (
       <React.Fragment>
-        <div className="details-header">Media Info:</div>
+        <div className="details-header">Media Info</div>
         <div className="file-details">{`Streams found: ${ingestObject.upload.streams.length > 0 ? ingestObject.upload.streams.join(", ") : "None"}`}</div>
       </React.Fragment>
     );
@@ -202,18 +206,58 @@ const ContentCreation = observer(() => {
     );
   };
 
+  const FabricBrowserLink = () => {
+    if(!rootStore.ingestStore.ingestObjectId || !rootStore.ingestStore.ingestObject.finalize.mezzanineHash) { return null; }
+
+    return (
+      <React.Fragment>
+        <h2 className="details-header">View in Fabric Browser</h2>
+        <button
+          className="action action-primary"
+          onClick={OpenObjectLink}
+        >
+          Link
+        </button>
+      </React.Fragment>
+    );
+  }
+
+  const GenerateEmbedPlayer = () => {
+    if(!rootStore.ingestStore.ingestObject.finalize.mezzanineHash) return null;
+
+    const GetSrc = async () => {
+      const url = await rootStore.ingestStore.GenerateEmbedUrl({
+        versionHash: rootStore.ingestStore.ingestObject.finalize.mezzanineHash,
+        auth: true
+      });
+
+      setEmbedPlayerSrc(url);
+    }
+
+    GetSrc();
+
+    return (
+      <React.Fragment>
+        <h2 className="details-header">Preview</h2>
+        <EmbedPlayer
+          src={embedPlayerSrc}
+        />
+      </React.Fragment>
+    );
+  }
+
   const IngestView = () => {
     let ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
 
     return (
       <React.Fragment>
-        <div className="details-header">Your file is being ingested:</div>
+        <h2 className="details-header">File Details</h2>
         <div className="file-details">
           <div>File: {files.length ? files[0].name || files[0].path : ""}</div>
           <div>Title: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</div>
           <div>Use DRM: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "enable_drm") ? "yes" : "no"}</div>
         </div>
-        <div className="details-header">Steps:</div>
+        <h2 className="details-header">Progress</h2>
         <div className="file-details-steps progress">
           <div className="progress-step">
             <ImageIcon
@@ -221,7 +265,7 @@ const ContentCreation = observer(() => {
               className="progress-icon"
             />
             <span>Uploading file</span>
-            <span>{`${ingestObject.upload?.percentage || 0}% Complete`}</span>
+            <span>{ingestObject.currentStep === "upload" && `${ingestObject.upload?.percentage || 0}% Complete`}</span>
           </div>
 
           <div className={`progress-step${ingestObject.currentStep === "upload" ? " pending-step" : ""}`}>
@@ -244,28 +288,8 @@ const ContentCreation = observer(() => {
         </div>
         { MediaInfo() }
         { IngestingErrors() }
-        {
-          (!!rootStore.ingestStore.ingestErrors.errors.length || ingestObject.finalize.mezzanineHash) && <div className="actions-container form-actions">
-            <button
-              className="action action-primary"
-              onClick={() => {
-                rootStore.ingestStore.ResetIngestForm();
-                setFiles([]);
-                setImages([]);
-              }}
-            >
-              Back
-            </button>
-          </div>
-        }
-        {
-          ingestObject.finalize.mezzanineHash &&
-          EmbedPlayer({
-            src: rootStore.ingestStore.GenerateEmbedUrl({
-              versionHash: ingestObject.finalize.mezzanineHash
-            })
-          })
-        }
+        { FabricBrowserLink() }
+        { GenerateEmbedPlayer() }
       </React.Fragment>
     );
   };
@@ -309,13 +333,37 @@ const ContentCreation = observer(() => {
 
   return (
     <div className="ingest-form">
+      <div className="app-header sticky">
+        <h3 className="header-text">Create Playable Media Object
+        </h3>
+        <div className="actions">
+          {
+            !!rootStore.ingestStore.ingestObjectId ?
+              <button
+                className="action action-primary"
+                onClick={() => {
+                  rootStore.ingestStore.ResetIngestForm();
+                  setFiles([]);
+                  setImages([]);
+                }}
+                disabled={!(rootStore.ingestStore.ingestErrors.errors.length || rootStore.ingestStore.ingestObject.finalize.mezzanineHash)}
+              >
+                Create New Object
+              </button> :
+              <button
+                className="action action-primary"
+                type="submit"
+                disabled={!rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title") || !files || loading}
+                onClick={HandleUpload}
+              >
+                Create
+              </button>
+          }
+        </div>
+      </div>
       {
         loading ? <PageLoader /> :
           <div className="edit-page">
-            <div className="edit-page__header">
-              <h2 className="edit-page__header__text">Ingest Media File
-              </h2>
-            </div>
             {
               rootStore.ingestStore.ingestObjectId ?
                 IngestView() :

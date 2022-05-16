@@ -45,6 +45,13 @@ class RootStore {
     this.address = yield this.client.CurrentAccountAddress();
     this.networkInfo = yield this.client.NetworkInfo();
   });
+
+  GenerateStateChannelToken = flow(function * ({objectId, versionHash}) {
+    return yield this.client.GenerateStateChannelToken({
+      objectId,
+      versionHash
+    });
+  });
 }
 
 export const rootStore = new RootStore();

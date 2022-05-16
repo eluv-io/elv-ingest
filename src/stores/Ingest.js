@@ -22,7 +22,6 @@ class IngestStore {
     });
 
     this.rootStore = rootStore;
-    // this.libraryId = "ilib2EKwfKiG4Z991NPD3cusJvM5Nzhi";
   }
 
   get client() {
@@ -37,13 +36,17 @@ class IngestStore {
     return this.ingestObjects[this.ingestObjectId];
   }
 
-  GenerateEmbedUrl = ({versionHash, objectId}) => {
+  GenerateEmbedUrl = flow (function * ({versionHash, objectId, auth=false}) {
     let embedUrl = new URL("https://embed.v3.contentfabric.io");
     const hasAudio = (rootStore.ingestStore.ingestObject?.upload?.streams || []).includes("audio");
 
     embedUrl.searchParams.set("p", "");
     embedUrl.searchParams.set("lp", "");
     embedUrl.searchParams.set("net", rootStore.networkInfo.name === "demov3" ? "demo" : rootStore.networkInfo.name);
+
+    if(auth) {
+      embedUrl.searchParams.set("ath", yield rootStore.GenerateStateChannelToken({objectId, versionHash}));
+    }
 
     if(versionHash) {
       embedUrl.searchParams.set("vid", versionHash);
@@ -59,7 +62,7 @@ class IngestStore {
     }
 
     return embedUrl.toString();
-  };
+  });
 
   UpdateIngestObject = (data) => {
     if(!this.ingestObjects[this.ingestObjectId]) {
@@ -175,10 +178,8 @@ class IngestStore {
       encryption: encrypt ? "cgck" : "none"
     });
 
-    // Set public permission
-    yield this.client.SetPermission({
-      objectId: id,
-      permission: "public"
+    this.UpdateIngestObject({
+      currentStep: "ingest"
     });
 
     // Bitcode method
@@ -211,10 +212,6 @@ class IngestStore {
         ...this.ingestObject.upload,
         streams: Object.keys(streams || {})
       }
-    });
-
-    this.UpdateIngestObject({
-      currentStep: "ingest"
     });
 
     // Merge metadata
@@ -379,12 +376,6 @@ class IngestStore {
       objectId
     });
 
-    // Set public permission
-    yield this.client.SetPermission({
-      objectId,
-      permission: "public"
-    });
-
     try {
       const { writeToken, hash } = yield this.client.StartABRMezzanineJobs({
         libraryId,
@@ -453,7 +444,7 @@ class IngestStore {
             clearInterval(statusIntervalId);
             done = true;
 
-            const embedUrl = this.GenerateEmbedUrl({
+            const embedUrl = await this.GenerateEmbedUrl({
               objectId: this.ingestObjectId
             });
 

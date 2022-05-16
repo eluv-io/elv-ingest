@@ -12,17 +12,16 @@
 }
 
 .action {
-  border-radius: 3px;
   cursor: pointer;
-  font-size: 14px;
-  height: 35px;
-  min-width: 130px;
+  font-size: 0.8rem;
+  min-width: 7.5rem;
   padding: 8px 20px;
   text-align: center;
   user-select: none;
 
   &:disabled {
     opacity: 0.4;
+    cursor: not-allowed;
   }
 
   &-icon {
@@ -61,8 +60,10 @@
     border: 1px solid $mediumgray;
     color: $black;
 
-    &:hover {
-      border-color: $darkgray;
+    &:not(:disabled) {
+      &:hover {
+        border-color: $darkgray;
+      }
     }
   }
 

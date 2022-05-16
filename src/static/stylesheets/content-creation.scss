@@ -1,4 +1,8 @@
 .ingest-form {
+  padding-top: 2rem;
+  position: relative;
+  width: 100%;
+
   .drop-container {
     display: flex;
     flex-direction: column;
@@ -33,21 +37,48 @@
     }
   }
 
+  .app-header {
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    flex-direction: row;
+    height: 4rem;
+    left: 0;
+    padding: 0 1rem;
+    top: 0;
+    width: 100%;
+
+    &.sticky {
+      position: fixed;
+    }
+
+    .actions {
+      align-items: center;
+      display: flex;
+      margin-left: auto;
+    }
+  }
+
+  .header-text {
+    font-size: 20px;
+  }
+
+  .edit-page {
+    margin-top: 2rem;
+  }
+
   .description {
     font-weight: 300;
   }
 
-  .ingest-form {
-    margin-top: 2rem;
-  }
-
   .details-header {
-    margin: 1rem 0;
+    font-size: 22px;
+    font-weight: 300;
+    margin: 1.5rem 0;
   }
 
   .file-details {
-    margin-left: 2.5rem;
-
     & * {
       line-height: 2rem;
     }
@@ -56,7 +87,6 @@
   .progress {
     display: grid;
     gap: 20px;
-    margin-left: 2.5rem;
     margin-top: 1rem;
 
     .progress-step {
@@ -71,8 +101,8 @@
     }
 
     .progress-icon {
-      height: 35px;
-      width: 35px;
+      height: 26px;
+      width: 26px;
     }
   }
 

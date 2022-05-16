@@ -4,7 +4,7 @@ import {FileInfo} from "Utils/Files";
 import {ValidateLibrary} from "@eluvio/elv-client-js/src/Validation";
 import {rootStore} from "./index";
 const ABR = require("@eluvio/elv-abr-profile");
-const LRO = require("@eluvio/elv-lro-status");
+import {enhanceLROStatus, defaultOptions} from "@eluvio/elv-lro-status";
 
 class IngestStore {
   ingestObjectId = undefined;
@@ -196,7 +196,7 @@ class IngestStore {
 
     if(errors) {
       console.error(errors);
-      this.UpdateIngestErrors("errors", "Error: Unable to ingest selected media file. Click the Back button below to try another file.");
+      this.UpdateIngestErrors("errors", "Error: Unable to ingest selected media file.");
     }
 
     // Check if audio and video streams
@@ -318,7 +318,7 @@ class IngestStore {
       });
 
       if(!production_master || !production_master.sources || !production_master.variants || !production_master.variants.default) {
-        this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile. Click the Back button below to try another file.");
+        this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile.");
         return;
       }
 
@@ -329,7 +329,7 @@ class IngestStore {
       );
 
       if(!generatedProfile.ok) {
-        this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile. Click the Back button below to try another file.");
+        this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile.");
         return;
       }
 
@@ -339,7 +339,7 @@ class IngestStore {
       };
     } catch(error) {
       console.error(error);
-      this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile. Click the Back button below to try another file.");
+      this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile.");
     }
   });
 
@@ -428,8 +428,16 @@ class IngestStore {
 
         if(statusIntervalId) clearInterval(statusIntervalId);
         statusIntervalId = setInterval( async () => {
-          const currentTime = new Date();
-          const enhancedStatus = LRO.EnhancedStatus(statusMap, currentTime);
+          const options = Object.assign(
+            defaultOptions(),
+            {currentTime: new Date()}
+          );
+          const enhancedStatus = enhanceLROStatus(options, statusMap);
+
+          if(!enhancedStatus.ok) {
+            console.error("Error processing LRO status");
+            this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
+          }
 
           const {estimated_time_left_seconds, estimated_time_left_h_m_s, run_state} = enhancedStatus.result.summary;
 
@@ -487,7 +495,7 @@ class IngestStore {
       }
     } catch(error) {
       console.error(error)
-      this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file. Click the Back button below to try another file.");
+      this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
 
       const {write_token} = yield this.client.EditContentObject({
         libraryId,
@@ -539,7 +547,7 @@ class IngestStore {
       });
     } catch(error) {
       console.error(error);
-      this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file. Click the Back button below to try another file.");
+      this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
     }
   });
 }

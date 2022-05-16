@@ -1,5 +1,5 @@
 import {FrameClient} from "@eluvio/elv-client-js/src/FrameClient";
-import {computed, configure, flow, makeAutoObservable, observable} from "mobx";
+import {configure, flow, makeAutoObservable} from "mobx";
 import IngestStore from "Stores/Ingest";
 import EditStore from "Stores/Edit";
 
@@ -13,8 +13,6 @@ class RootStore {
   currentAccountAddress = undefined;
   address = undefined;
   libraryId = undefined;
-
-  navigationBreadcrumbs = [];
 
   constructor() {
     makeAutoObservable(this);

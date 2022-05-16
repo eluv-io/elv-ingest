@@ -14,7 +14,7 @@
     "@date-io/luxon": "^1.3.13",
     "@eluvio/elv-abr-profile": "^0.2.0",
     "@eluvio/elv-client-js": "^3.1.73",
-    "@eluvio/elv-lro-status": "2.0.0",
+    "@eluvio/elv-lro-status": "3.0.0",
     "@eluvio/elv-player-js": "^1.0.63",
     "@material-ui/core": "^4.12.3",
     "@material-ui/pickers": "^3.3.10",

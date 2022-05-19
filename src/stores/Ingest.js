@@ -4,7 +4,8 @@ import {FileInfo} from "Utils/Files";
 import {ValidateLibrary} from "@eluvio/elv-client-js/src/Validation";
 import {rootStore} from "./index";
 const ABR = require("@eluvio/elv-abr-profile");
-import {enhanceLROStatus, defaultOptions} from "@eluvio/elv-lro-status";
+const defaultOptions = require("@eluvio/elv-lro-status/defaultOptions");
+const enhanceLROStatus = require("@eluvio/elv-lro-status/enhanceLROStatus");
 
 class IngestStore {
   ingestObjectId = undefined;
@@ -35,34 +36,6 @@ class IngestStore {
   get ingestObject() {
     return this.ingestObjects[this.ingestObjectId];
   }
-
-  GenerateEmbedUrl = flow (function * ({versionHash, objectId, auth=false}) {
-    let embedUrl = new URL("https://embed.v3.contentfabric.io");
-    const hasAudio = (rootStore.ingestStore.ingestObject?.upload?.streams || []).includes("audio");
-
-    embedUrl.searchParams.set("p", "");
-    embedUrl.searchParams.set("lp", "");
-    embedUrl.searchParams.set("net", rootStore.networkInfo.name === "demov3" ? "demo" : rootStore.networkInfo.name);
-
-    if(auth) {
-      embedUrl.searchParams.set("ath", yield rootStore.GenerateStateChannelToken({objectId, versionHash}));
-    }
-
-    if(versionHash) {
-      embedUrl.searchParams.set("vid", versionHash);
-    } else {
-      embedUrl.searchParams.set("oid", objectId);
-    }
-
-    if(hasAudio) {
-      // NFT has audio, set to autohide controls, audio enabled
-      embedUrl.searchParams.set("ct", "s");
-    } else {
-      embedUrl.searchParams.set("ct", "h");
-    }
-
-    return embedUrl.toString();
-  });
 
   UpdateIngestObject = (data) => {
     if(!this.ingestObjects[this.ingestObjectId]) {
@@ -118,15 +91,43 @@ class IngestStore {
     }
   }
 
-  WaitForPublish = flow (function * ({latestHash, libraryId, objectId}) {
+  GenerateEmbedUrl = flow (function * ({versionHash, objectId, auth=false}) {
+    let embedUrl = new URL("https://embed.v3.contentfabric.io");
+    const hasAudio = (rootStore.ingestStore.ingestObject?.upload?.streams || []).includes("audio");
+
+    embedUrl.searchParams.set("p", "");
+    embedUrl.searchParams.set("lp", "");
+    embedUrl.searchParams.set("net", rootStore.networkInfo.name === "demov3" ? "demo" : rootStore.networkInfo.name);
+
+    if(auth) {
+      embedUrl.searchParams.set("ath", yield rootStore.GenerateStateChannelToken({objectId, versionHash}));
+    }
+
+    if(versionHash) {
+      embedUrl.searchParams.set("vid", versionHash);
+    } else {
+      embedUrl.searchParams.set("oid", objectId);
+    }
+
+    if(hasAudio) {
+      // NFT has audio, set to autohide controls, audio enabled
+      embedUrl.searchParams.set("ct", "s");
+    } else {
+      embedUrl.searchParams.set("ct", "h");
+    }
+
+    return embedUrl.toString();
+  });
+
+  WaitForPublish = flow (function * ({hash, libraryId, objectId}) {
     let publishFinished = false;
-    let latestObjectData = {};
+    let latestObjectHash;
     while(!publishFinished) {
-      latestObjectData = yield this.client.ContentObject({
-        libraryId, objectId
+      latestObjectHash = yield this.client.LatestVersionHash({
+        objectId
       });
 
-      if(latestObjectData.hash === latestHash) {
+      if(latestObjectHash === hash) {
         publishFinished = true;
       } else {
         yield new Promise(resolve => setTimeout(resolve, 15000));
@@ -371,7 +372,7 @@ class IngestStore {
     const objectId = createResponse.id;
 
     yield this.WaitForPublish({
-      latestHash: createResponse.hash,
+      hash: createResponse.hash,
       libraryId,
       objectId
     });
@@ -383,7 +384,7 @@ class IngestStore {
       });
 
       yield this.WaitForPublish({
-        latestHash: hash,
+        hash,
         libraryId,
         objectId
       });
@@ -416,15 +417,19 @@ class IngestStore {
       }
 
       let done;
+      let error;
       let statusIntervalId;
 
-      while(!done) {
-        let statusMap = yield this.client.LROStatus({
+      while(!done && !error) {
+        let status = yield this.client.LROStatus({
           libraryId,
           objectId
         });
 
-        if(statusMap === undefined) console.error("Received no job status information from server - object already finalized?");
+        if(status === undefined) {
+          console.error("Received no job status information from server - object already finalized?");
+          return;
+        }
 
         if(statusIntervalId) clearInterval(statusIntervalId);
         statusIntervalId = setInterval( async () => {
@@ -432,11 +437,14 @@ class IngestStore {
             defaultOptions(),
             {currentTime: new Date()}
           );
-          const enhancedStatus = enhanceLROStatus(options, statusMap);
+          const enhancedStatus = enhanceLROStatus(options, status);
 
           if(!enhancedStatus.ok) {
             console.error("Error processing LRO status");
             this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
+            clearInterval(statusIntervalId);
+            error = true;
+            return;
           }
 
           const {estimated_time_left_seconds, estimated_time_left_h_m_s, run_state} = enhancedStatus.result.summary;

@@ -5,14 +5,13 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
 
 module.exports = {
   entry: "./src/index.js",
   target: "web",
   output: {
     path: Path.resolve(__dirname, "dist"),
-    filename: "index.js",
+    filename: "[name].js",
     chunkFilename: "[name].[contenthash].bundle.js"
   },
   devServer: {
@@ -49,7 +48,7 @@ module.exports = {
       to: Path.join(__dirname, "dist", "configuration.js")
     }]),
     new HtmlWebpackPlugin({
-      title: "Eluvio Video Asset Manager",
+      title: "Eluvio Ingest App",
       template: Path.join(__dirname, "src", "index.html"),
       inject: "body",
       cache: false,
@@ -63,13 +62,11 @@ module.exports = {
     alias: {
       Assets: Path.resolve(__dirname, "src/static"),
       Components: Path.resolve(__dirname, "src/components"),
-      // Specs: Path.resolve(__dirname, "src/static/specs"),
       Stores: Path.resolve(__dirname, "src/stores"),
       Utils: Path.resolve(__dirname, "src/utils"),
       // Force webpack to use *one* copy of bn.js instead of 8
       "bn.js": Path.resolve(Path.join(__dirname, "node_modules", "bn.js")),
-      "@eluvio/elv-client-js$": "@eluvio/elv-client-js/dist/ElvClient-min.js",
-      "@eluvio/elv-lro-status": "@eluvio/elv-lro-status/src/ElvLROStatus.js"
+      "@eluvio/elv-client-js$": "@eluvio/elv-client-js/dist/ElvClient-min.js"
     },
     extensions: [".js", ".jsx", ".scss", ".png", ".svg"],
   },
@@ -101,6 +98,8 @@ module.exports = {
         options: {
           presets: ["@babel/preset-env", "@babel/preset-react", "babel-preset-mobx"],
           plugins: [
+            ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
+            ["@babel/plugin-proposal-private-methods", { "loose": true }],
             require("@babel/plugin-proposal-object-rest-spread"),
             require("@babel/plugin-transform-regenerator"),
             require("@babel/plugin-transform-runtime")

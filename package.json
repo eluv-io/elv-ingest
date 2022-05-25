@@ -5,7 +5,7 @@
   "main": "index.js",
   "author": "Eluvio, Inc.",
   "scripts": {
-    "dev": "webpack-dev-server --hot --port 8400",
+    "serve": "webpack-dev-server --hot --port 8400",
     "build": "rm -rf dist/* && webpack-cli --mode production --no-devtool",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

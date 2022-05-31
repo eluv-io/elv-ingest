@@ -10,6 +10,7 @@ const AsyncComponent = observer(({loaded, Load, children, Render, className=""})
     Load()
       .then(() => setLoaded(true))
       .catch(error => {
+        /* eslint-disable no-console */
         console.error(error);
         setError(error);
       });

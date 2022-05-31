@@ -1,4 +1,4 @@
-import {flow, computed, makeAutoObservable, makeObservable, observable} from "mobx";
+import {flow, makeAutoObservable} from "mobx";
 import {SafeSet, SafeTraverse} from "Utils/Misc";
 import UrlJoin from "url-join";
 import Utils from "@eluvio/elv-client-js/src/Utils";
@@ -12,13 +12,6 @@ class EditStore {
   publicMetadata = {};
   originalMetadata = {};
   updatedMetadata = {};
-
-  /*
-    writeTokens = {
-      "iq__33aasCButcoYPfkkgaS92rzwNCtP": "tqw__HSVndP9Pv5aZbmr9cCrD7Mm1GorsnT6ZMrZ9oxrfkfBU5hzq1ZMvow33h58GMMrxfWHfx3xnuxe6wyNuXhE"
-    };
-
-   */
 
   get client() {
     return this.rootStore.client;
@@ -122,7 +115,7 @@ class EditStore {
       this.edits,
       { objectId, path: UrlJoin(path, name), value, localization: localizationKey },
       [ objectId, this.currentLocalization, UrlJoin(path, name) ]
-    )
+    );
   }
 
   AppendListValue(objectId, path, value, options={}) {
@@ -186,7 +179,7 @@ class EditStore {
       libraryId,
       objectId,
       writeToken: this.writeTokens[objectId]
-    })
+    });
   }
 
   WriteToken = flow (function * ({objectId}) {

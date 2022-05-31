@@ -10,6 +10,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error) {
+    /* eslint-disable no-console */
     console.error(error);
     this.setState({error});
   }

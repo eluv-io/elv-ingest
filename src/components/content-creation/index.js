@@ -158,7 +158,7 @@ const ContentCreation = observer(() => {
       },
       noResponse: true
     });
-  }
+  };
 
   const SetIcon = (step) => {
     const ingestObject = toJS(rootStore.ingestStore.ingestObject);
@@ -220,7 +220,7 @@ const ContentCreation = observer(() => {
         </button>
       </React.Fragment>
     );
-  }
+  };
 
   const GenerateEmbedPlayer = () => {
     if(!rootStore.ingestStore.ingestObject.finalize.mezzanineHash) return null;
@@ -232,7 +232,7 @@ const ContentCreation = observer(() => {
       });
 
       setEmbedPlayerSrc(url);
-    }
+    };
 
     GetSrc();
 
@@ -244,7 +244,7 @@ const ContentCreation = observer(() => {
         />
       </React.Fragment>
     );
-  }
+  };
 
   const IngestView = () => {
     let ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
@@ -338,7 +338,7 @@ const ContentCreation = observer(() => {
         </h3>
         <div className="actions">
           {
-            !!rootStore.ingestStore.ingestObjectId ?
+            rootStore.ingestStore.ingestObjectId ?
               <button
                 className="action action-primary"
                 onClick={() => {

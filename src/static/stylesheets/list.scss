@@ -11,7 +11,7 @@
 
     &:not(.list__header) {
       &:not(:disabled) {
-        &:hover {
+        &:hover { // sass-lint:disable-line nesting-depth
           border-left: 3px solid $blue;
         }
       }

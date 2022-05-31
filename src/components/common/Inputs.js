@@ -29,6 +29,7 @@ export const LabelledField = observer(({name, label, hint, children, className="
     let hintPath = hint;
 
     if(!hint) {
+      /* eslint-disable no-console */
       console.warn("Missing hint:", hintPath);
     }
   }
@@ -76,7 +77,9 @@ const UpdateValue = (props, eventOrValue) => {
 
     editStore.SetValue(props.objectId, path, props.name, value, {localize: props.localize});
   } catch(error) {
+    /* eslint-disable no-console */
     console.error(`Failed to update value ${props.name}`);
+    /* eslint-disable no-console */
     console.error(error);
   }
 };
@@ -319,6 +322,7 @@ export const Price = observer((props) => {
           .find(part => part.type === "currency")
           .value;
       } catch(error) {
+        /* eslint-disable no-console */
         console.error(`Failed to determine currency symbol for ${currency}`);
       }
 

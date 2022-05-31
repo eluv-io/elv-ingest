@@ -119,7 +119,7 @@ class IngestStore {
     return embedUrl.toString();
   });
 
-  WaitForPublish = flow (function * ({hash, libraryId, objectId}) {
+  WaitForPublish = flow (function * ({hash, objectId}) {
     let publishFinished = false;
     let latestObjectHash;
     while(!publishFinished) {
@@ -135,7 +135,7 @@ class IngestStore {
     }
   });
 
-  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, description, displayName, images=[], callback, CreateCallback}) {
+  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, description, displayName, images=[], CreateCallback}) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
@@ -196,6 +196,7 @@ class IngestStore {
     });
 
     if(errors) {
+      /* eslint-disable no-console */
       console.error(errors);
       this.UpdateIngestErrors("errors", "Error: Unable to ingest selected media file.");
     }
@@ -277,7 +278,7 @@ class IngestStore {
     if(abrProfileExclude.ok) {
       abrProfile = abrProfileExclude.result;
     } else {
-      this.UpdateIngestErrors("errors", "Error: ABR Profile has no relevant playout formats.")
+      this.UpdateIngestErrors("errors", "Error: ABR Profile has no relevant playout formats.");
     }
 
     this.CreateABRMezzanine({
@@ -339,6 +340,7 @@ class IngestStore {
         contentTypeId: libABRMetadata.mez_content_type
       };
     } catch(error) {
+      /* eslint-disable no-console */
       console.error(error);
       this.UpdateIngestErrors("errors", "Error: Unable to create ABR profile.");
     }
@@ -351,13 +353,11 @@ class IngestStore {
     name,
     description,
     displayName,
-    metadata,
     images=[],
     masterVersionHash,
     abrProfile,
     variant="default",
-    offeringKey="default",
-    writeToken
+    offeringKey="default"
   }) {
     const createResponse = yield this.client.CreateABRMezzanine({
       libraryId,
@@ -427,6 +427,7 @@ class IngestStore {
         });
 
         if(status === undefined) {
+          /* eslint-disable no-console */
           console.error("Received no job status information from server - object already finalized?");
           return;
         }
@@ -440,6 +441,7 @@ class IngestStore {
           const enhancedStatus = enhanceLROStatus(options, status);
 
           if(!enhancedStatus.ok) {
+            /* eslint-disable no-console */
             console.error("Error processing LRO status");
             this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
             clearInterval(statusIntervalId);
@@ -496,13 +498,14 @@ class IngestStore {
               writeToken,
               name
             });
-          };
+          }
         }, 1000);
 
         yield new Promise(resolve => setTimeout(resolve, 15000));
       }
     } catch(error) {
-      console.error(error)
+      /* eslint-disable no-console */
+      console.error(error);
       this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
 
       const {write_token} = yield this.client.EditContentObject({
@@ -554,6 +557,7 @@ class IngestStore {
         }
       });
     } catch(error) {
+      /* eslint-disable no-console */
       console.error(error);
       this.UpdateIngestErrors("errors", "Error: Unable to transcode selected file.");
     }

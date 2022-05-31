@@ -30,6 +30,7 @@ const ConfirmModal = ({message, Confirm, Close}) => {
                       setConfirming(true);
                       await Confirm();
                     } catch(error) {
+                      /* eslint-disable no-console */
                       console.error(error);
                       setConfirming(false);
                     }

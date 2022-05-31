@@ -43,6 +43,7 @@ main {
 
 .app-container {
   align-items: flex-start;
+  flex-direction: row;
   padding: 1rem;
 }
 
@@ -55,10 +56,6 @@ main {
   color: $white;
   font-weight: 300;
   padding: 10px 20px;
-}
-
-.app-container {
-  flex-direction: row;
 }
 
 .page-container-nav {

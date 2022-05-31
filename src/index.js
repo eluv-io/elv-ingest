@@ -1,9 +1,10 @@
 import "Assets/stylesheets/app.scss";
 
-import React from 'react';
-import {render} from 'react-dom';
+import React from "react";
+import {render} from "react-dom";
 import {rootStore} from "Stores";
 
+/* eslint-disable no-console */
 window.js = content => console.log(JSON.stringify(content, null, 2));
 
 import "./static/stylesheets/app.scss";
@@ -20,7 +21,7 @@ const App = observer(() => {
         <AsyncComponent
           Load={() => rootStore.Initialize()}
           Render={() => <ContentCreation />}
-          />
+        />
       </div>
     </MuiPickersUtilsProvider>
   );

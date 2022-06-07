@@ -13,6 +13,11 @@
     font-weight: 300;
     margin: 20px 0;
   }
+
+  &__section__header__description {
+    color: $darkgray;
+    margin-bottom: 20px;
+  }
 }
 
 .form-actions {

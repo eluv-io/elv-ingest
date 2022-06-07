@@ -21,7 +21,7 @@
       flex-direction: column;
       height: 300px;
       justify-content: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       width: 100%;
 
       &.drag-active {
@@ -37,10 +37,15 @@
     }
   }
 
+  .file-selected {
+    color: $darkgray;
+    font-size: 14px;
+  }
+
   .app-header {
     align-items: center;
     background: $white;
-    border-bottom: 1px solid $white;
+    border-bottom: 1px solid $lightgray;
     display: flex;
     flex-direction: row;
     height: 4rem;
@@ -69,7 +74,7 @@
   }
 
   .description {
-    font-weight: 300;
+    color: $darkgray;
   }
 
   .details-header {
@@ -78,9 +83,47 @@
     margin: 1.5rem 0;
   }
 
-  .file-details {
-    & * {
-      line-height: 2rem;
+  .detail-field {
+    display: flex;
+    min-height: 1.8rem;
+    padding: 0.25rem 1rem 0.25rem 0;
+
+    label {
+      color: $darkgray;
+      display: flex;
+      min-width: 150px;
+    }
+
+    &>div {
+      flex-grow: 1;
+      text-overflow: ellipsis;
+    }
+
+    .copyable {
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      display: flex;
+
+      &>div {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        max-width: 525px;
+      }
+
+      .copy-icon {
+        height: 1.2em;
+        margin-left: 0.5rem;
+        width: 1.2em;
+      }
+
+      .-elv-copyable {
+        cursor: pointer;
+      }
     }
   }
 
@@ -93,7 +136,7 @@
       align-items: center;
       display: grid;
       gap: 20px 10px; // sass-lint:disable-line no-misspelled-properties
-      grid-template-columns: 45px 1fr 1fr;
+      grid-template-columns: 45px 1fr 3fr;
 
       &.pending-step {
         opacity: 0.4;

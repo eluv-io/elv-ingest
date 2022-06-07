@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import ImageIcon from "../common/ImageIcon";
-import {Form, Input} from "../common/Inputs";
+import {Form, Input, Select} from "../common/Inputs";
 import {observer} from "mobx-react";
 import {useDropzone} from "react-dropzone";
 
@@ -15,6 +15,9 @@ import {toJS} from "mobx";
 import UrlJoin from "url-join";
 import {PageLoader} from "../common/Loader";
 import EmbedPlayer from "./EmbedPlayer";
+import {ToggleSection} from "elv-components-js";
+import {Copyable} from "Components/common/Copyable";
+import {Link} from "@material-ui/core";
 
 const ContentCreation = observer(() => {
   const [files, setFiles] = useState([]);
@@ -79,7 +82,8 @@ const ContentCreation = observer(() => {
         libraryId,
         files,
         title: rootStore.editStore.Value(libraryId, "", "title") || files[0].name,
-        encrypt: rootStore.editStore.Value(libraryId, "", "enable_drm") || false,
+        encrypt: ["both", "drm"].includes(rootStore.editStore.Value(libraryId, "", "playbackEncryption")),
+        enableClear: ["both", "clear"].includes(rootStore.editStore.Value(libraryId, "", "enable_clear")),
         description: rootStore.editStore.Value(libraryId, "", "description"),
         displayName: rootStore.editStore.Value(libraryId, "", "display_name"),
         images,
@@ -121,29 +125,38 @@ const ContentCreation = observer(() => {
           />
 
           <h2 className="form__section__header">
-            Digital Rights Management
+            Playout Options
           </h2>
-          <Input
-            type="checkbox"
+          <div className="form__section__header__description">Select a playback encryption option. Enable Clear and/or Digital Rights Management copy protection during playback.</div>
+
+          <Select
+            required
             objectId={objectId}
-            label="Use DRM copy protection during playback"
-            name="enable_drm"
+            name="playbackEncryption"
             path=""
-            disabled={disableDrm}
-          />
+            label="Playback encryption"
+          >
+            <option value="">Please select an option</option>
+            <option value="drm" disabled={disableDrm}>Digital Rights Management</option>
+            <option value="clear">Clear</option>
+            <option value="both">Both</option>
+          </Select>
 
           <h2 className="form__section__header">
-            Image
+            NFT Image
           </h2>
-          {
-            DragDropForm({
-              inputProps: imageDropzone.getInputProps,
-              rootProps: imageDropzone.getRootProps,
-              isDragActive: imageDropzone.isDragActive,
-              title: "Upload an image",
-              files: images
-            })
-          }
+          <div className="form__section__header__description">Upload an image that will be used for your NFT. A square image is recommended.</div>
+          <ToggleSection
+            sectionName="Image Uploader"
+            children={
+              DragDropForm({
+                inputProps: imageDropzone.getInputProps,
+                rootProps: imageDropzone.getRootProps,
+                isDragActive: imageDropzone.isDragActive,
+                files: images
+              })
+            }
+          />
         </div>
       </Form>
     );
@@ -191,7 +204,10 @@ const ContentCreation = observer(() => {
     return (
       <React.Fragment>
         <div className="details-header">Media Info</div>
-        <div className="file-details">{`Streams found: ${ingestObject.upload.streams.length > 0 ? ingestObject.upload.streams.join(", ") : "None"}`}</div>
+        <div className="detail-field">
+          <label>Streams found:</label>
+          <span>{ingestObject.upload.streams.length > 0 ? ingestObject.upload.streams.join(", ") : "None"}</span>
+        </div>
       </React.Fragment>
     );
   };
@@ -212,12 +228,18 @@ const ContentCreation = observer(() => {
     return (
       <React.Fragment>
         <h2 className="details-header">View in Fabric Browser</h2>
-        <button
-          className="action action-primary"
-          onClick={OpenObjectLink}
-        >
-          Link
-        </button>
+        <div className="detail-field">
+          <label>Object ID:</label>
+          <Link className="inline-link" onClick={OpenObjectLink} >
+            { rootStore.ingestStore.ingestObject.finalize.objectId}
+          </Link>
+        </div>
+        <div className="detail-field">
+          <label>Hash:</label>
+          <Copyable copy={rootStore.ingestStore.ingestObject.finalize.mezzanineHash}>
+            <div>{rootStore.ingestStore.ingestObject.finalize.mezzanineHash}</div>
+          </Copyable>
+        </div>
       </React.Fragment>
     );
   };
@@ -232,6 +254,7 @@ const ContentCreation = observer(() => {
       });
 
       setEmbedPlayerSrc(url);
+      if(!embedPlayerSrc) return null;
     };
 
     GetSrc();
@@ -248,15 +271,34 @@ const ContentCreation = observer(() => {
 
   const IngestView = () => {
     let ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
+    const PlayoutOptionsText = () => {
+      const playbackEncryption = rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playbackEncryption");
+
+      if(playbackEncryption === "both") {
+        return "DRM, Clear";
+      } else if(playbackEncryption === "drm") {
+        return "DRM";
+      } else {
+        return "Clear";
+      }
+    };
 
     return (
       <React.Fragment>
         <h2 className="details-header">File Details</h2>
-        <div className="file-details">
-          <div>File: {files.length ? files[0].name || files[0].path : ""}</div>
-          <div>Title: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</div>
-          <div>Use DRM: {rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "enable_drm") ? "yes" : "no"}</div>
+        <div className="detail-field">
+          <label>File:</label>
+          <span>{files.length ? files[0].name || files[0].path : ""}</span>
         </div>
+        <div className="detail-field">
+          <label>Title:</label>
+          <span>{rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</span>
+        </div>
+        <div className="detail-field">
+          <label>Playout option(s):</label>
+          <span>{PlayoutOptionsText()}</span>
+        </div>
+
         <h2 className="details-header">Progress</h2>
         <div className="file-details-steps progress">
           <div className="progress-step">
@@ -309,7 +351,7 @@ const ContentCreation = observer(() => {
             <input {...inputProps()} />
           </div>
         </section>
-        <div>File selected: {files.length ? files[0].name : ""}</div>
+        <div className="file-selected">File selected: {files.length ? files[0].name : ""}</div>
       </React.Fragment>
     );
   };
@@ -317,18 +359,34 @@ const ContentCreation = observer(() => {
   const FormView = () => {
     return (
       <React.Fragment>
+        <h2 className="form__section__header">
+          Media
+        </h2>
+        <div className="form__section__header__description">Upload a video or audio file for ingestion.</div>
         {
           DragDropForm({
             inputProps: getInputProps,
             rootProps: getRootProps,
             isDragActive,
-            title: "Upload a video or audio file",
             files
           })
         }
         { IngestForm() }
       </React.Fragment>
     );
+  };
+
+  const DisableSubmit = () => {
+    if(
+      !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title") ||
+      !files ||
+      loading ||
+      !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playbackEncryption")
+    ) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -353,7 +411,7 @@ const ContentCreation = observer(() => {
               <button
                 className="action action-primary"
                 type="submit"
-                disabled={!rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title") || !files || loading}
+                disabled={DisableSubmit()}
                 onClick={HandleUpload}
               >
                 Create

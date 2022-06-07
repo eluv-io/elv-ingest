@@ -63,7 +63,7 @@ class IngestStore {
       errors: [],
       warnings: []
     };
-    rootStore.editStore.SetValue(this.libraryId, "enable_drm");
+    rootStore.editStore.SetValue(this.libraryId, "playback_encryption");
     rootStore.editStore.SetValue(this.libraryId, "title");
     rootStore.editStore.SetValue(this.libraryId, "description");
     rootStore.editStore.SetValue(this.libraryId, "display_name");
@@ -94,10 +94,11 @@ class IngestStore {
   GenerateEmbedUrl = flow (function * ({versionHash, objectId, auth=false}) {
     let embedUrl = new URL("https://embed.v3.contentfabric.io");
     const hasAudio = (rootStore.ingestStore.ingestObject?.upload?.streams || []).includes("audio");
+    const networkName = rootStore.networkInfo.name === "demov3" ? "demo" : (rootStore.networkInfo.name === "test" && rootStore.networkInfo.id === 955205) ? "testv4" : rootStore.networkInfo.name;
 
     embedUrl.searchParams.set("p", "");
     embedUrl.searchParams.set("lp", "");
-    embedUrl.searchParams.set("net", rootStore.networkInfo.name === "demov3" ? "demo" : rootStore.networkInfo.name);
+    embedUrl.searchParams.set("net", networkName);
 
     if(auth) {
       embedUrl.searchParams.set("ath", yield rootStore.GenerateStateChannelToken({objectId, versionHash}));
@@ -135,7 +136,7 @@ class IngestStore {
     }
   });
 
-  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, description, displayName, images=[], CreateCallback}) {
+  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, enableClear, description, displayName, images=[], CreateCallback}) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
@@ -268,17 +269,20 @@ class IngestStore {
       awaitCommitConfirmation: false
     });
 
-    let abrProfileExclude;
-    if(encrypt) {
-      abrProfileExclude = ABR.ProfileExcludeClear(abrProfile);
-    } else {
-      abrProfileExclude = ABR.ProfileExcludeDRM(abrProfile);
-    }
+    if(!(enableClear && encrypt)) {
+      let abrProfileExclude;
 
-    if(abrProfileExclude.ok) {
-      abrProfile = abrProfileExclude.result;
-    } else {
-      this.UpdateIngestErrors("errors", "Error: ABR Profile has no relevant playout formats.");
+      if(encrypt) {
+        abrProfileExclude = ABR.ProfileExcludeClear(abrProfile);
+      } else {
+        abrProfileExclude = ABR.ProfileExcludeDRM(abrProfile);
+      }
+
+      if(abrProfileExclude.ok) {
+        abrProfile = abrProfileExclude.result;
+      } else {
+        this.UpdateIngestErrors("errors", "Error: ABR Profile has no relevant playout formats.");
+      }
     }
 
     this.CreateABRMezzanine({
@@ -550,10 +554,11 @@ class IngestStore {
         libraryId,
         objectId
       });
-      const latestHash = finalizeAbrResponse.hash;
+
       this.UpdateIngestObject({
         finalize: {
-          mezzanineHash: latestHash
+          mezzanineHash: finalizeAbrResponse.hash,
+          objectId: finalizeAbrResponse.id
         }
       });
     } catch(error) {

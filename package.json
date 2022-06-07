@@ -27,7 +27,7 @@
     "@eluvio/elv-abr-profile": "^1.0.0",
     "@eluvio/elv-client-js": "^3.1.73",
     "@eluvio/elv-lro-status": "^3.0.3",
-    "@eluvio/elv-player-js": "^1.0.63",
+    "@eluvio/elv-player-js": "^1.0.78",
     "@material-ui/core": "^4.12.3",
     "@material-ui/pickers": "^3.3.10",
     "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git",

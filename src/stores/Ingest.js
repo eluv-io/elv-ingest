@@ -63,10 +63,10 @@ class IngestStore {
       errors: [],
       warnings: []
     };
-    rootStore.editStore.SetValue(this.libraryId, "playback_encryption");
-    rootStore.editStore.SetValue(this.libraryId, "title");
-    rootStore.editStore.SetValue(this.libraryId, "description");
-    rootStore.editStore.SetValue(this.libraryId, "display_name");
+    rootStore.editStore.SetValue(rootStore.formObjectId, "playback_encryption");
+    rootStore.editStore.SetValue(rootStore.formObjectId, "name");
+    rootStore.editStore.SetValue(rootStore.formObjectId, "description");
+    rootStore.editStore.SetValue(rootStore.formObjectId, "display_name");
   }
 
   CreateLink({targetHash, linkTarget="/meta/public/asset_metadata", options={}}) {
@@ -156,12 +156,21 @@ class IngestStore {
       metadataSubtree: "/abr"
     });
 
-    const {id, write_token} = yield this.client.CreateContentObject({
-      libraryId,
-      options: libABRMetadata.mez_content_type ? { type: libABRMetadata.mez_content_type } : {}
-    });
+    let response;
+    if(rootStore.objectId) {
+      response = yield this.client.EditContentObject({
+        libraryId,
+        objectId: rootStore.objectId,
+        options: libABRMetadata.mez_content_type ? { type: libABRMetadata.mez_content_type } : {}
+      });
+    } else {
+      response = yield this.client.CreateContentObject({
+        libraryId,
+        options: libABRMetadata.mez_content_type ? { type: libABRMetadata.mez_content_type } : {}
+      });
+    }
 
-    this.ingestObjectId = id;
+    this.ingestObjectId = response.id;
     this.UpdateIngestObject({
       currentStep: "upload"
     });
@@ -169,13 +178,18 @@ class IngestStore {
     if(CreateCallback && typeof CreateCallback === "function") CreateCallback();
 
     // Create encryption conk
-    yield this.client.CreateEncryptionConk({libraryId, objectId: id, writeToken: write_token, createKMSConk: true});
+    yield this.client.CreateEncryptionConk({
+      libraryId,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
+      createKMSConk: true
+    });
 
     // Upload files
     yield this.client.UploadFiles({
       libraryId,
-      objectId: id,
-      writeToken: write_token,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
       fileInfo,
       callback: (progress) => {
         const fileProgress = progress[files[0].path];
@@ -196,8 +210,8 @@ class IngestStore {
     // Bitcode method
     const {errors} = yield this.client.CallBitcodeMethod({
       libraryId,
-      objectId: id,
-      writeToken: write_token,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
       method: UrlJoin("media", "production_master", "init"),
       body: {
         access: []
@@ -214,8 +228,8 @@ class IngestStore {
     // Check if audio and video streams
     const streams = (yield this.client.ContentObjectMetadata({
       libraryId,
-      objectId: id,
-      writeToken: write_token,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
       metadataSubtree: UrlJoin("production_master", "variants", "default", "streams")
     }));
 
@@ -229,8 +243,8 @@ class IngestStore {
     // Merge metadata
     yield this.client.MergeMetadata({
       libraryId,
-      objectId: id,
-      writeToken: write_token,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
       metadata: {
         public: {
           name: `${title} [ingest: uploading] MASTER`,
@@ -247,15 +261,15 @@ class IngestStore {
     // Create ABR Ladder
     let {abrProfile, contentTypeId} = yield this.CreateABRLadder({
       libraryId,
-      objectId: id,
-      writeToken: write_token
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token
     });
 
     // Update name to remove [ingest: uploading]
     yield this.client.MergeMetadata({
       libraryId,
-      objectId: id,
-      writeToken: write_token,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
       metadata: {
         public: {
           name: `${title} MASTER`,
@@ -272,8 +286,8 @@ class IngestStore {
     // Finalize object
     const finalizeResponse = yield this.client.FinalizeContentObject({
       libraryId,
-      objectId: id,
-      writeToken: write_token,
+      objectId: this.ingestObjectId,
+      writeToken: response.write_token,
       commitMessage: "Create master object",
       awaitCommitConfirmation: false
     });
@@ -466,7 +480,7 @@ class IngestStore {
 
           this.UpdateIngestObject({
             ingest: {
-              runState: enhancedStatus.result.summary.run_state,
+              runState: run_state,
               estimatedTimeLeft: !estimated_time_left_seconds ? "Calculating..." : estimated_time_left_h_m_s
             }
           });

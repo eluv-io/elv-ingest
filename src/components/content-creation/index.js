@@ -81,10 +81,10 @@ const ContentCreation = observer(() => {
       await rootStore.ingestStore.CreateProductionMaster({
         libraryId,
         files,
-        title: rootStore.editStore.Value(libraryId, "", "title") || files[0].name,
-        playbackEncryption: rootStore.editStore.Value(libraryId, "", "playback_encryption") || "both",
-        description: rootStore.editStore.Value(libraryId, "", "description"),
-        displayName: rootStore.editStore.Value(libraryId, "", "display_name"),
+        title: rootStore.editStore.Value(rootStore.formObjectId, "", "name") || files[0].name,
+        playbackEncryption: rootStore.editStore.Value(rootStore.formObjectId, "", "playback_encryption") || "both",
+        description: rootStore.editStore.Value(rootStore.formObjectId, "", "description"),
+        displayName: rootStore.editStore.Value(rootStore.formObjectId, "asset_metadata", "display_name"),
         images,
         CreateCallback: () => setLoading(false)
       });
@@ -94,35 +94,38 @@ const ContentCreation = observer(() => {
   };
 
   const IngestForm = () => {
-    const objectId = rootStore.ingestStore.libraryId;
 
     return (
       <Form className="ingest-form">
-        <div className="form__section">
-          <h2 className="form__section__header">
-            About
-          </h2>
-          <Input
-            required
-            name="title"
-            label="Name"
-            objectId={objectId}
-            path=""
-          />
-          <Input
-            required
-            name="display_name"
-            label="Display Name"
-            objectId={objectId}
-            path=""
-          />
-          <Input
-            name="description"
-            label="Description"
-            objectId={objectId}
-            path=""
-          />
+        {
+          <div className="form__section">
+            <h2 className="form__section__header">
+              About
+            </h2>
+            <Input
+              required
+              name="name"
+              label="Name"
+              objectId={rootStore.formObjectId}
+              path=""
+            />
+            <Input
+              required
+              name="display_title"
+              label="Display Name"
+              objectId={rootStore.formObjectId}
+              path="asset_metadata"
+            />
+            <Input
+              name="description"
+              label="Description"
+              objectId={rootStore.formObjectId}
+              path=""
+            />
+          </div>
+        }
 
+        <div className="form__section">
           <h2 className="form__section__header">
             Playout Options
           </h2>
@@ -130,7 +133,7 @@ const ContentCreation = observer(() => {
 
           <Select
             required
-            objectId={objectId}
+            objectId={rootStore.formObjectId}
             name="playback_encryption"
             path=""
             label="Playback encryption"
@@ -140,7 +143,9 @@ const ContentCreation = observer(() => {
             <option value="clear">Clear</option>
             <option value="both" disabled={disableDrm}>Both</option>
           </Select>
+        </div>
 
+        <div className="form__section">
           <h2 className="form__section__header">
             NFT Image
           </h2>
@@ -291,7 +296,7 @@ const ContentCreation = observer(() => {
         </div>
         <div className="detail-field">
           <label>Title:</label>
-          <span>{rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</span>
+          <span>{rootStore.editStore.Value(rootStore.formObjectId, "", "name")}</span>
         </div>
         <div className="detail-field">
           <label>Playout {playbackEncryption === "both" ? "options" : "option"}:</label>
@@ -377,10 +382,10 @@ const ContentCreation = observer(() => {
 
   const DisableSubmit = () => {
     if(
-      !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title") ||
-      !files ||
+      !rootStore.editStore.Value(rootStore.formObjectId, "", "name") ||
+      !files.length ||
       loading ||
-      !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playback_encryption")
+      !rootStore.editStore.Value(rootStore.formObjectId, "", "playback_encryption")
     ) {
       return true;
     }

@@ -82,8 +82,7 @@ const ContentCreation = observer(() => {
         libraryId,
         files,
         title: rootStore.editStore.Value(libraryId, "", "title") || files[0].name,
-        encrypt: ["both", "drm"].includes(rootStore.editStore.Value(libraryId, "", "playbackEncryption")),
-        enableClear: ["both", "clear"].includes(rootStore.editStore.Value(libraryId, "", "enable_clear")),
+        playbackEncryption: rootStore.editStore.Value(libraryId, "", "playback_encryption") || "both",
         description: rootStore.editStore.Value(libraryId, "", "description"),
         displayName: rootStore.editStore.Value(libraryId, "", "display_name"),
         images,
@@ -132,14 +131,14 @@ const ContentCreation = observer(() => {
           <Select
             required
             objectId={objectId}
-            name="playbackEncryption"
+            name="playback_encryption"
             path=""
             label="Playback encryption"
           >
             <option value="">Please select an option</option>
             <option value="drm" disabled={disableDrm}>Digital Rights Management</option>
             <option value="clear">Clear</option>
-            <option value="both">Both</option>
+            <option value="both" disabled={disableDrm}>Both</option>
           </Select>
 
           <h2 className="form__section__header">
@@ -271,9 +270,9 @@ const ContentCreation = observer(() => {
 
   const IngestView = () => {
     let ingestObject = toJS(rootStore.ingestStore.ingestObject) || {};
-    const PlayoutOptionsText = () => {
-      const playbackEncryption = rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playbackEncryption");
+    const playbackEncryption = rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playback_encryption");
 
+    const PlayoutOptionsText = () => {
       if(playbackEncryption === "both") {
         return "DRM, Clear";
       } else if(playbackEncryption === "drm") {
@@ -295,7 +294,7 @@ const ContentCreation = observer(() => {
           <span>{rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title")}</span>
         </div>
         <div className="detail-field">
-          <label>Playout option(s):</label>
+          <label>Playout {playbackEncryption === "both" ? "options" : "option"}:</label>
           <span>{PlayoutOptionsText()}</span>
         </div>
 
@@ -381,7 +380,7 @@ const ContentCreation = observer(() => {
       !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "title") ||
       !files ||
       loading ||
-      !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playbackEncryption")
+      !rootStore.editStore.Value(rootStore.ingestStore.libraryId, "", "playback_encryption")
     ) {
       return true;
     }

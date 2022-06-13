@@ -136,7 +136,16 @@ class IngestStore {
     }
   });
 
-  CreateProductionMaster = flow(function * ({libraryId, files, title, encrypt, enableClear, description, displayName, images=[], CreateCallback}) {
+  CreateProductionMaster = flow(function * ({
+    libraryId,
+    files,
+    title,
+    playbackEncryption="both",
+    description,
+    displayName,
+    images=[],
+    CreateCallback
+  }) {
     ValidateLibrary(libraryId);
 
     const fileInfo = yield FileInfo("", files);
@@ -177,7 +186,7 @@ class IngestStore {
           }
         });
       },
-      encryption: encrypt ? "cgck" : "none"
+      encryption: ["both", "drm"].includes(playbackEncryption) ? "cgck" : "none"
     });
 
     this.UpdateIngestObject({
@@ -269,12 +278,12 @@ class IngestStore {
       awaitCommitConfirmation: false
     });
 
-    if(!(enableClear && encrypt)) {
+    if(playbackEncryption !== "both") {
       let abrProfileExclude;
 
-      if(encrypt) {
+      if(playbackEncryption === "drm") {
         abrProfileExclude = ABR.ProfileExcludeClear(abrProfile);
-      } else {
+      } else if(playbackEncryption === "clear") {
         abrProfileExclude = ABR.ProfileExcludeDRM(abrProfile);
       }
 

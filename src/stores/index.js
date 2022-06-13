@@ -10,9 +10,10 @@ configure({
 
 class RootStore {
   client = undefined;
-  currentAccountAddress = undefined;
   address = undefined;
   libraryId = undefined;
+  objectId = undefined;
+  formObjectId = undefined;
 
   constructor() {
     makeAutoObservable(this);
@@ -40,6 +41,15 @@ class RootStore {
     }
 
     this.libraryId = yield params.libraryId;
+    this.objectId = yield params.objectId;
+    this.formObjectId = this.objectId || this.libraryId;
+
+    if(this.objectId) {
+      this.editStore.LoadAssetMetadata({
+        objectId: this.objectId
+      });
+    }
+
     this.address = yield this.client.CurrentAccountAddress();
     this.networkInfo = yield this.client.NetworkInfo();
   });

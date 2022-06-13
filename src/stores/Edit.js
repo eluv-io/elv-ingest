@@ -46,7 +46,7 @@ class EditStore {
     return this.publicMetadata[objectId];
   });
 
-  LoadAssetMetadata = flow(function * ({objectId, versionHash}) {
+  LoadAssetMetadata = flow(function * ({objectId, versionHash, path="/public"}) {
     if(this.originalMetadata[objectId]) { return; }
 
     if(!objectId) {
@@ -58,14 +58,14 @@ class EditStore {
     this.versionHashes[objectId] = versionHash;
     this.originalMetadata[objectId] = yield this.client.ContentObjectMetadata({
       versionHash,
-      metadataSubtree: "/public/asset_metadata"
+      metadataSubtree: path
     });
     this.updatedMetadata[objectId] = {
       default: this.originalMetadata[objectId]
     };
   });
 
-  InitializeValue(objectId, path, name) {
+  InitializeValue(objectId, path, name, value) {
     const currentValue = SafeTraverse((this.updatedMetadata[objectId] || {})["default"], UrlJoin(path || "", name || ""));
 
     if(typeof currentValue !== "undefined") {

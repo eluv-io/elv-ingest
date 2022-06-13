@@ -1,6 +1,6 @@
 {
   "name": "ingest-app",
-  "version": "1.1.7",
+  "version": "1.2.8",
   "description": "A simple application to ingest media onto the Eluvio Fabric",
   "main": "index.js",
   "author": "Eluvio, Inc.",

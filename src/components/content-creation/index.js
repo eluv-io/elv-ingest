@@ -15,9 +15,8 @@ import {toJS} from "mobx";
 import UrlJoin from "url-join";
 import {PageLoader} from "../common/Loader";
 import EmbedPlayer from "./EmbedPlayer";
-import {ToggleSection} from "elv-components-js";
 import {Copyable} from "Components/common/Copyable";
-import {Link} from "@material-ui/core";
+import {ToggleSection} from "elv-components-js/src/components/v2/Inputs";
 
 const ContentCreation = observer(() => {
   const [files, setFiles] = useState([]);
@@ -234,9 +233,9 @@ const ContentCreation = observer(() => {
         <h2 className="details-header">View in Fabric Browser</h2>
         <div className="detail-field">
           <label>Object ID:</label>
-          <Link className="inline-link" onClick={OpenObjectLink} >
+          <a href className="inline-link" onClick={OpenObjectLink} >
             { rootStore.ingestStore.ingestObject.finalize.objectId}
-          </Link>
+          </a>
         </div>
         <div className="detail-field">
           <label>Hash:</label>

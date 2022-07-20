@@ -192,11 +192,16 @@ class IngestStore {
       writeToken: response.write_token,
       fileInfo,
       callback: (progress) => {
-        const fileProgress = progress[files[0].path];
+        let uploadSum = 0;
+        let totalSum = 0;
+        Object.values(progress).forEach(fileProgress => {
+          uploadSum += fileProgress.uploaded;
+          totalSum += fileProgress.total;
+        });
 
         this.UpdateIngestObject({
           upload: {
-            percentage: Math.round((fileProgress.uploaded / fileProgress.total) * 100)
+            percentage: Math.round((uploadSum / totalSum) * 100)
           }
         });
       },
@@ -204,6 +209,10 @@ class IngestStore {
     });
 
     this.UpdateIngestObject({
+      upload: {
+        ...this.ingestObject.upload,
+        complete: true,
+      },
       currentStep: "ingest"
     });
 

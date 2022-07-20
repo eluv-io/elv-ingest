@@ -16,7 +16,7 @@ import UrlJoin from "url-join";
 import {PageLoader} from "../common/Loader";
 import EmbedPlayer from "./EmbedPlayer";
 import {Copyable} from "Components/common/Copyable";
-import {ToggleSection} from "elv-components-js/src/components/v2/Inputs";
+import {ToggleSection} from "Components/common/ToggleSection";
 
 const ContentCreation = observer(() => {
   const [files, setFiles] = useState([]);
@@ -62,7 +62,6 @@ const ContentCreation = observer(() => {
     isDragActive
   } = useDropzone({
     accept: "audio/*, video/*",
-    multiple: false,
     onDrop: (files) => setFiles(files)
   });
 
@@ -80,7 +79,7 @@ const ContentCreation = observer(() => {
       await rootStore.ingestStore.CreateProductionMaster({
         libraryId,
         files,
-        title: rootStore.editStore.Value(rootStore.formObjectId, "", "name") || files[0].name,
+        title: rootStore.editStore.Value(rootStore.formObjectId, "", "name"),
         playbackEncryption: rootStore.editStore.Value(rootStore.formObjectId, "", "playback_encryption") || "both",
         description: rootStore.editStore.Value(rootStore.formObjectId, "", "description"),
         displayName: rootStore.editStore.Value(rootStore.formObjectId, "asset_metadata", "display_name"),
@@ -93,7 +92,6 @@ const ContentCreation = observer(() => {
   };
 
   const IngestForm = () => {
-
     return (
       <Form className="ingest-form">
         {
@@ -233,12 +231,13 @@ const ContentCreation = observer(() => {
         <h2 className="details-header">View in Fabric Browser</h2>
         <div className="detail-field">
           <label>Object ID:</label>
-          <a href className="inline-link" onClick={OpenObjectLink} >
+          <button type="button" className="inline-link" onClick={OpenObjectLink} >
             { rootStore.ingestStore.ingestObject.finalize.objectId}
-          </a>
+          </button>
         </div>
         <div className="detail-field">
           <label>Hash:</label>
+          <button type="button" className="inline-link"></button>
           <Copyable copy={rootStore.ingestStore.ingestObject.finalize.mezzanineHash}>
             <div>{rootStore.ingestStore.ingestObject.finalize.mezzanineHash}</div>
           </Copyable>
@@ -290,8 +289,14 @@ const ContentCreation = observer(() => {
       <React.Fragment>
         <h2 className="details-header">File Details</h2>
         <div className="detail-field">
-          <label>File:</label>
-          <span>{files.length ? files[0].name || files[0].path : ""}</span>
+          <label>{files.length === 1 ? "File:" : "Files:"}</label>
+          <div className="file-names">
+            {
+              files.map((file, index) => (
+                <div key={`${file.name || file.path}-${index}`}>{file.name || file.path}</div>
+              ))
+            }
+          </div>
         </div>
         <div className="detail-field">
           <label>Title:</label>
@@ -309,7 +314,7 @@ const ContentCreation = observer(() => {
               icon={SetIcon("upload")}
               className="progress-icon"
             />
-            <span>Uploading file</span>
+            <span>{`Uploading ${files.length === 0 ? "file" : "files"}`}</span>
             <span>{ingestObject.currentStep === "upload" && `${ingestObject.upload?.percentage || 0}% Complete`}</span>
           </div>
 
@@ -354,7 +359,11 @@ const ContentCreation = observer(() => {
             <input {...inputProps()} />
           </div>
         </section>
-        <div className="file-selected">File selected: {files.length ? files[0].name : ""}</div>
+        {
+          files.map(file => (
+            <div className="file-selected" key={file.name}>File: {file.name}</div>
+          ))
+        }
       </React.Fragment>
     );
   };
@@ -409,7 +418,7 @@ const ContentCreation = observer(() => {
                 }}
                 disabled={!(rootStore.ingestStore.ingestErrors.errors.length || rootStore.ingestStore.ingestObject.finalize.mezzanineHash)}
               >
-                Create New Object
+                Reset
               </button> :
               <button
                 className="action action-primary"

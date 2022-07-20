@@ -1,11 +1,7 @@
 import React, {useEffect} from "react";
 import {observer} from "mobx-react";
 import {editStore} from "Stores";
-import ImageIcon from "Components/common/ImageIcon";
-
 import {GenerateUUID} from "Utils/Misc";
-import ToolTip from "Components/common/ToolTip";
-import HintIcon from "Assets/icons/help-square.svg";
 
 const Validations = {
   NAN: (value) => isNaN(value) ? 0 : value,
@@ -30,16 +26,6 @@ export const LabelledField = observer(({name, label, hint, children, className="
         <div className="labelled-field__label-text">
           { label }
         </div>
-        {
-          hint ?
-            <ToolTip className="hint" content={<pre className="labelled-field__hint-content">{ hint }</pre>}>
-              <ImageIcon
-                alt={hint}
-                icon={HintIcon}
-                className="labelled-field__hint"
-              />
-            </ToolTip> : null
-        }
       </label>
       { children }
     </div>

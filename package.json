@@ -27,12 +27,14 @@
     "@eluvio/elv-client-js": "^3.1.73",
     "@eluvio/elv-lro-status": "^3.0.3",
     "@eluvio/elv-player-js": "^1.0.78",
+    "@radix-ui/react-tooltip": "^0.1.7",
     "elv-components-js": "git+https://github.com/eluv-io/elv-components-js.git#media-apps",
     "mobx": "^6.5.0",
     "mobx-react": "^7.2.1",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "react-dropzone": "^12.0.4",
+    "select": "^1.1.2",
     "url-join": "^4.0.1"
   },
   "devDependencies": {
